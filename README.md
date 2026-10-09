@@ -1,4 +1,14 @@
-# AnyLLMintoTypeSafe
+# LLMtoSystemOne
+
+<p align="center"><img src="docs/banner.png" alt="LLMtoSystemOne: turn any Hugging Face LLM into a calibrated decision model" width="100%"></p>
+
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-3776AB">
+  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green">
+  <img alt="Models" src="https://img.shields.io/badge/models-any%20HF%20causal%20LM-FFD21E">
+  <img alt="API" src="https://img.shields.io/badge/API-TypeSafe%20%2Fv1%2Fsystemone-58a6ff">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-21%20passing-brightgreen">
+</p>
 
 Turn **any Hugging Face causal LLM** into a **Jev-style decision model**: you give it a state and a set of options, and it returns a calibrated probability for each option. It never generates free text. It also serves a **TypeSafe-compatible API** (`POST /v1/systemone`), so existing TypeSafe clients can point at a local, open-weights model by changing one URL.
 
@@ -30,11 +40,31 @@ These are the public JevBench items (231), scored by the official harness at com
 - **The 0.6B LoRA run used about 3% of the paper's data.** It ran on CPU with 2,992 examples. The JevBench accuracy change is not significant (exact sign test, p = 0.57). Calibration halved, consistency across paraphrases rose from 75% to 86%, and Banking77 went from 24.0% to 40.5%.
 - Per-item results, summaries and training logs are in [`runs/`](runs/).
 
+## Inference latency
+
+This is the time to predict one class, measured per decision on the 231 JevBench items. It ran on CPU only (AMD Ryzen 9 5950X, fp32, no GPU). Reproduce it with `python scripts/latency_report.py`.
+
+| Model | median | mean | p95 | first request |
+|---|---|---|---|---|
+| Qwen3-0.6B | **0.53 s** | 1.66 s | 6.61 s | 1.7 s |
+| Qwen3.5-4B | **5.16 s** | 10.29 s | 34.53 s | 17.9 s |
+
+| Prompt length | Qwen3-0.6B (median) | Qwen3.5-4B (median) |
+|---|---|---|
+| < 300 tokens (a ticket, a message) | 0.47 s | 4.58 s |
+| 300–800 tokens | 0.96 s | 7.28 s |
+| > 800 tokens (long policies, documents) | 5.79 s | 31.14 s |
+
+- **Prompt length drives the cost, not the number of classes.** The prompt is read once, and each extra option adds only 2–4 tokens (`3]`, `12]`). Going from 3 to 77 classes costs little next to a longer text.
+- **The 4B model is about 10× slower than the 0.6B.** It has 7× the parameters, and cache mode runs two forward passes: the prompt, then the suffixes.
+- **The first request is slower** because it runs a one-time check of the scoring mode. Pass `--mode tree` (attention-only models) or `--mode cache` (Qwen3.5) to skip it.
+- **A GPU should be much faster** (use `--dtype bfloat16`). These numbers do not measure it.
+
 ## Install
 
 ```bash
-git clone --recursive https://github.com/pedroliveiraAI/AnyLLMintoTypeSafe
-cd AnyLLMintoTypeSafe
+git clone --recursive https://github.com/pedroliveiraAI/LLMtoSystemOne
+cd LLMtoSystemOne
 python -m venv .venv
 .venv/Scripts/pip install -e ".[dev,serve]"        # Linux/macOS: .venv/bin/pip
 ```
@@ -236,6 +266,7 @@ examples/                         HTTP client and in-process usage
 scripts/                          end-to-end pipelines (Qwen3-0.6B, Qwen3.5-4B)
 tests/                            21 tests: trie, scoring equivalence (incl. a hybrid model), losses, gradients, API
 third_party/jevbench              official harness (git submodule, MIT)
+docs/banner.png                   social preview (scripts/make_banner.py)
 runs/                             results reported above (no model weights)
 ```
 
@@ -247,6 +278,9 @@ runs/                             results reported above (no model weights)
 - The "TypeSafe-compatible" claim is verified against the request and response contract that JevBench's `typesafe` adapter uses. Fields outside that contract are not implemented.
 
 ## Credits
+
+The code in this repository is released under the [MIT License](LICENSE).
+
 
 - Method: Yinheng Li and Justin Wagle, [LLM-as-Jev (arXiv 2610.02076v2)](https://arxiv.org/abs/2610.02076v2).
 - Benchmark and harness: [JevBench](https://github.com/fstandhartinger/jevbench) (MIT).
