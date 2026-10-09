@@ -1,0 +1,26 @@
+# environments and caches
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+
+# model weights (LoRA adapters, merged models) - reproduce with `jevforge train` / `jevforge export`
+*.safetensors
+*.bin
+runs/**/checkpoint-*/
+merged/
+
+# per-item raw harness evidence and local logs
+runs/**/raw/
+runs/**/ledger.jsonl
+runs/serve_*.log
+
+# tokenizer copies saved next to adapters (identical to the base model's) and regenerable training data
+runs/**/tokenizer.json
+runs/**/tokenizer_config.json
+runs/**/vocab.json
+runs/**/merges.txt
+runs/**/added_tokens.json
+runs/**/special_tokens_map.json
+runs/**/chat_template.jinja
+runs/**/train_data.jsonl

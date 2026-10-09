@@ -1,0 +1,13 @@
+{
+  "post_bracket": {
+    "n": 231,
+    "stop": 0,
+    "echo": 228,
+    "other": 3,
+    "no_bracket": 0,
+    "run_on": 231,
+    "run_on_rate": 1.0,
+    "drift_rate": 0.012987012987012988,
+    "prefill": "Best answer: ["
+  }
+}

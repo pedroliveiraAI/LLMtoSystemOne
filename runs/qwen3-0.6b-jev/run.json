@@ -1,0 +1,6 @@
+{
+  "model": "Qwen/Qwen3-0.6B",
+  "adapter": "runs/qwen3-0.6b-jev",
+  "label": "Qwen3-0.6B LoRA (jevforge)",
+  "trained": true
+}

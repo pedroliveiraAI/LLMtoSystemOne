@@ -1,0 +1,13 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[jevbench] 231 tasks, harness commit 1bcc55e, model=Qwen3.5-4B training-free (jevforge)
+25/231 completed
+50/231 completed
+75/231 completed
+100/231 completed
+125/231 completed
+150/231 completed
+175/231 completed
+200/231 completed
+225/231 completed
+[jevbench] accuracy=0.7835 (181/231) ece=0.0405 brier=0.2841 macro_family=0.7879 schema_validity=1.000
+scripts/run_qwen3.5_4b.sh: line 15: 10199 Illegal instruction     $JF train --model $M --mix general --max-examples $N_TRAIN --out $JEV --label "Qwen3.5-4B LoRA (jevforge)"

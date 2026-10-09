@@ -1,0 +1,5 @@
+{
+  "model": "Qwen/Qwen3.5-4B",
+  "adapter": null,
+  "label": "Qwen3.5-4B training-free (jevforge)"
+}
